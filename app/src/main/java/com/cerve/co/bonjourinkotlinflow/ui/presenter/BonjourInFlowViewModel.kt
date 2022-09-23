@@ -1,0 +1,11 @@
+package com.cerve.co.bonjourinkotlinflow.ui.presenter
+
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class BonjourInFlowViewModel @Inject constructor() : ViewModel() {
+
+
+}
