@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.cerve.co.bonjourinkotlinflow.ui.component.SampleScreen
 import com.cerve.co.bonjourinkotlinflow.ui.theme.BonjourInKotlinFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -19,8 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             BonjourInKotlinFlowTheme {
-                // A surface container using the 'background' color from the theme
-
+                SampleScreen()
             }
         }
     }

@@ -1,5 +1,6 @@
 package com.cerve.co.bonjour_in_flow
 
+import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import com.cerve.co.bonjour_in_flow.discover.DiscoverConfiguration
@@ -24,12 +25,17 @@ class NSDManagerInFlowImpl(private val nsdManager: NsdManager) : NSDManagerInFlo
 
         awaitClose {
             // also stop discovery?
-            cancel()
         }
     }
 
     override fun resolveService() {
         TODO("Not yet implemented")
+    }
+
+    companion object {
+        fun fromContext(
+            context: Context
+        ) = NSDManagerInFlowImpl(context.getSystemService(Context.NSD_SERVICE) as NsdManager)
     }
 
 }

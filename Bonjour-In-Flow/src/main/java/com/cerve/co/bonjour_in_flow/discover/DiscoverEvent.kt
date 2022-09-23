@@ -1,6 +1,8 @@
 package com.cerve.co.bonjour_in_flow.discover
 
 import android.net.nsd.NsdServiceInfo
+import android.util.Log
+import timber.log.Timber
 
 sealed class DiscoverEvent {
 
@@ -19,4 +21,5 @@ sealed class DiscoverEvent {
     data class DiscoveryStopSuccess(val serviceType: String?)
         : Throwable("onDiscoveryStopped success for $serviceType")
 
+    fun logIt() { Log.d("DiscoverEvent", toString())}
 }
