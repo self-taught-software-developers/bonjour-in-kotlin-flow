@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Bonjour In Kotlin Flow"
-include ':app'
 include ':Bonjour-In-Flow'
+include ':sample'
