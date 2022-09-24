@@ -21,5 +21,9 @@ sealed class DiscoverEvent {
     data class DiscoveryStopSuccess(val serviceType: String?)
         : Throwable("onDiscoveryStopped success for $serviceType")
 
-    fun logIt() { Log.d("DiscoverEvent", toString())}
+    fun logIt() { Log.d("DiscoverEvent", toString()) }
+
+    fun isService() : Boolean {
+        return this is ServiceFound || this is ServiceLost
+    }
 }

@@ -1,7 +1,6 @@
 package com.cerve.co.sample
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cerve.co.bonjour_in_flow.BonjourInFlow
@@ -19,8 +18,10 @@ class SampleViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            bonjourInFlow.discoverAllServices().collect { event ->
-                Log.d("SampleViewModel", "DiscoverEvent : $event")
+            bonjourInFlow.discoverServices().collect { event ->
+
+                //TODO add or remove from the list.
+
             }
         }
     }

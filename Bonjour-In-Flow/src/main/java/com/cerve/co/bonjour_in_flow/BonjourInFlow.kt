@@ -2,19 +2,19 @@ package com.cerve.co.bonjour_in_flow
 
 import android.content.Context
 import android.net.nsd.NsdServiceInfo
-import android.util.Log
 import com.cerve.co.bonjour_in_flow.discover.DiscoverConfiguration
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onEmpty
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 
 class BonjourInFlow(private val nsdMangerInFlow: NSDManagerInFlow) {
     constructor(context: Context) : this(NSDManagerInFlowImpl.fromContext(context))
 
-    fun discoverAllServices() = nsdMangerInFlow.discoverService(
+    fun discoverServices() = nsdMangerInFlow.discoverService(
             DiscoverConfiguration(SERVICES_DOMAIN)
-        ).onEmpty { Log.d("DiscoverEvent", "Started") }
+        ).filter { it.isService() }.onEach { it.logIt() }
+
+    fun discoverServicesWithState() = nsdMangerInFlow.discoverService(
+        DiscoverConfiguration(SERVICES_DOMAIN)
+    ).onEach { it.logIt() }
 
     fun discoverByServiceType(serviceType: String) {
         nsdMangerInFlow.discoverService(
