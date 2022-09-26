@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cerve.co.sample.ui.component.SampleScreen
 import com.cerve.co.sample.ui.theme.BonjourInKotlinFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -24,26 +25,10 @@ class SampleActivity : ComponentActivity() {
                 val vm : SampleViewModel = viewModel()
 
                 // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colors.background
-                ) {
-                    Greeting("Android")
-                }
+                SampleScreen(
+                    bonjourDiscoveryList = vm.liveServices
+                )
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    BonjourInKotlinFlowTheme {
-        Greeting("Android")
     }
 }

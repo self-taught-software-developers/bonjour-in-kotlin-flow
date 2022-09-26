@@ -1,7 +1,9 @@
 package com.cerve.co.sample
 
 import android.content.Context
+import android.net.nsd.NsdServiceInfo
 import android.util.Log
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cerve.co.bonjour_in_flow.BonjourInFlow
@@ -24,12 +26,23 @@ class SampleViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val bonjourInFlow : BonjourInFlow by lazy { BonjourInFlow(context) }
+    val liveServices = mutableStateListOf<NsdServiceInfo>()
 
     init {
         viewModelScope.launch {
 
-            bonjourInFlow.discoverServicesWithState().collect { event ->
-                //TODO add or remove from the list.
+            bonjourInFlow.discoverServicesWithState()
+                .collect { event ->
+
+                    when(event) {
+                        is DiscoverEvent.ServiceFound,
+                        is DiscoverEvent.ServiceUnResolved,
+                        is DiscoverEvent.ServiceResolved -> event.serviceInfo()
+                            ?.let { liveServices.add(it) }
+                        is DiscoverEvent.ServiceLost -> liveServices.remove(event.serviceInfo())
+                        else -> Unit
+                    }
+
             }
 
         }
