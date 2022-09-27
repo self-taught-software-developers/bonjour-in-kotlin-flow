@@ -1,32 +1,21 @@
 package com.cerve.co.sample
 
-import android.content.Context
 import android.net.nsd.NsdServiceInfo
-import android.util.Log
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.toMutableStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cerve.co.bonjour_in_flow.BonjourInFlow
 import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.MARVELL_TYPE
 import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.REALTEK_TYPE
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.toDiscoveryType
 import com.cerve.co.bonjour_in_flow.TimedBonjourInFlow
-import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withTimeout
 import javax.inject.Inject
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    @ApplicationContext context: Context
+    timedBonjourInFlow: TimedBonjourInFlow
 ) : ViewModel() {
-
-    private val bonjourInFlow : TimedBonjourInFlow by lazy { TimedBonjourInFlow(context) }
 
     private val _sampleUi = MutableStateFlow(SampleUiState())
     val sampleUi = _sampleUi.asStateFlow()
@@ -51,7 +40,7 @@ class SampleViewModel @Inject constructor(
 //                    }
 //
 //                }
-            bonjourInFlow.searchByNameWithTimeout(
+            timedBonjourInFlow.searchByNameWithTimeout(
                 name = "SIMPLEconnect Fan-C6985E",
                 types = Pair(REALTEK_TYPE, MARVELL_TYPE)
             )?.let {
