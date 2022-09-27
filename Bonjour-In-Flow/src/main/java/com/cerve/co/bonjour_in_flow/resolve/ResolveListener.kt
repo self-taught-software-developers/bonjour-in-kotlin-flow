@@ -12,11 +12,9 @@ data class ResolveListener(
 
     override fun onResolveFailed(service: NsdServiceInfo, errorCode: Int) {
         scope.trySendBlocking(DiscoverEvent.ServiceUnResolved(service, errorCode))
-        scope.channel.close()
     }
 
     override fun onServiceResolved(service: NsdServiceInfo) {
         scope.trySendBlocking(DiscoverEvent.ServiceResolved(service))
-        scope.channel.close()
     }
 }

@@ -1,59 +1,57 @@
 package com.cerve.co.bonjour_in_flow
 
 import android.content.Context
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.toDiscoveryType
+import android.net.nsd.NsdServiceInfo
+import android.util.Log
 import com.cerve.co.bonjour_in_flow.discover.DiscoverConfiguration
 import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 
-class BonjourInFlow(private val nsdMangerInFlow: NSDManagerInFlow) {
+class BonjourInFlow(private val manager: NSDManagerInFlow) {
     constructor(context: Context) : this(NSDManagerInFlowImpl.fromContext(context))
 
+    /**
+     *
+     */
     fun discoverServices() = channelFlow {
-        nsdMangerInFlow.discoverService(
-            DiscoverConfiguration(SERVICES_DOMAIN)
-        ).collect { event ->
+        manager.discoverService(DiscoverConfiguration(SERVICES_DOMAIN)).collect { event ->
 
             launch {
 
                 event.serviceInfo()?.let { service ->
-
-                    discoverByServiceType(service.serviceName.toDiscoveryType())
+                    manager.discoverServiceByType(service.serviceName.toDiscoveryType())
                         .filter { it.isService() }
+                        .mapResolve()
                         .collect { send(it) }
-
                 }
 
             }
         }
-    }
+    }.flowOn(IO)
+
     fun discoverServicesWithState() = channelFlow {
-        nsdMangerInFlow.discoverService(
-            DiscoverConfiguration(SERVICES_DOMAIN)
-        ).collect { event ->
+        manager.discoverService(DiscoverConfiguration(SERVICES_DOMAIN)).collect { event ->
 
             launch {
 
                 event.serviceInfo()?.let { service ->
-
-                    discoverByServiceType(service.serviceName.toDiscoveryType())
+                    manager.discoverServiceByType(service.serviceName.toDiscoveryType())
+                        .mapResolve()
                         .collect { send(it) }
-
                 } ?: send(event)
 
             }
         }
-    }
+    }.flowOn(IO)
 
-    private fun discoverByServiceType(serviceType: String) = nsdMangerInFlow.discoverService(
-        DiscoverConfiguration(serviceType)
-    )
 
-    //TODO unresolved isn't being emitted
-    fun <T: DiscoverEvent> Flow<T>.resolveIt() : Flow<DiscoverEvent> {
+    private fun <T: DiscoverEvent> Flow<T>.mapResolve() : Flow<DiscoverEvent> {
         return this.map { event ->
-            nsdMangerInFlow.resolveService(event).first()
+            manager.resolveService(event).first()
         }
     }
 
@@ -65,6 +63,25 @@ class BonjourInFlow(private val nsdMangerInFlow: NSDManagerInFlow) {
         fun String.toDiscoveryType() : String {
             return "$this._tcp"
         }
+
+        fun <T> Flow<T>.logThreadLifecycle() : Flow<T> {
+            return this
+                .onStart { Log.d("DiscoverEvent", "start thread activity ${currentCoroutineContext()}") }
+                .onCompletion { Log.d("DiscoverEvent", "completion thread activity ${currentCoroutineContext()}") }
+        }
+
     }
 
+}
+
+data class ZippedDiscoverEvent(
+    val name1 : String,
+    val name2 : String,
+    val type : String,
+    val host : InetAddress,
+    val port : Int
+) {
+    fun logIt() {
+        Log.d("DiscoverEvent", "${toString()}")
+    }
 }
