@@ -1,7 +1,6 @@
 package com.cerve.co.bonjour_in_flow
 
 import android.content.Context
-import android.net.nsd.NsdServiceInfo
 import android.util.Log
 import com.cerve.co.bonjour_in_flow.discover.DiscoverConfiguration
 import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
