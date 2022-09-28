@@ -3,9 +3,7 @@ package com.cerve.co.sample
 import android.net.nsd.NsdServiceInfo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.MARVELL_TYPE
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.REALTEK_TYPE
-import com.cerve.co.bonjour_in_flow.TimedBonjourInFlow
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,7 +12,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    timedBonjourInFlow: TimedBonjourInFlow
+//    timedBonjourInFlow: TimedBonjourInFlow
 ) : ViewModel() {
 
     private val _sampleUi = MutableStateFlow(SampleUiState())
@@ -39,13 +37,13 @@ class SampleViewModel @Inject constructor(
 //                        else -> _sampleUi.update { it.copy(nsdState = UiDiscoveryState.IDLE) }
 //                    }
 //
-//                }
-            timedBonjourInFlow.searchByNameWithTimeout(
-                name = "SIMPLEconnect Fan-C6985E",
-                types = Pair(REALTEK_TYPE, MARVELL_TYPE)
-            )?.let {
-
-            }
+////                }
+//            timedBonjourInFlow.searchByNameWithTimeout(
+//                name = "SIMPLEconnect Fan-C6985E",
+//                types = Pair(REALTEK_TYPE, MARVELL_TYPE)
+//            )?.let {
+//
+//            }
 
         }
     }
