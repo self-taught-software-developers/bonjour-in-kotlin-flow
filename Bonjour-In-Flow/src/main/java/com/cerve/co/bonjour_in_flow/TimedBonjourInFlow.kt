@@ -4,9 +4,9 @@ import android.content.Context
 import android.net.nsd.NsdServiceInfo
 import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.logThreadLifecycle
 import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
+import com.cerve.co.bonjour_in_flow.discover.model.ZippedDiscoverEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 
 class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
@@ -42,7 +42,6 @@ class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
         }
 
     }
-
 
     private suspend fun DiscoverEvent.resolve() : NsdServiceInfo? {
         return manager.resolveService(this).first().serviceInfo()

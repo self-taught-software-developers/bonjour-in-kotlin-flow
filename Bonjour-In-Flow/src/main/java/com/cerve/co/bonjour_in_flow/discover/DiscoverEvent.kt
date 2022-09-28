@@ -1,7 +1,6 @@
 package com.cerve.co.bonjour_in_flow.discover
 
 import android.net.nsd.NsdServiceInfo
-import android.util.Log
 import timber.log.Timber
 
 sealed class DiscoverEvent {
@@ -24,7 +23,9 @@ sealed class DiscoverEvent {
     data class DiscoveryStopSuccess(val serviceType: String?)
         : Throwable("onDiscoveryStopped success for $serviceType")
 
-    fun logIt(msg: String = "") { Log.d("DiscoverEvent","$msg ${toString()}") }
+    fun logIt(msg: String = "") {
+        Timber.tag(TAG).d("$msg ${toString()}")
+    }
 
     fun isService() : Boolean {
         return this is ServiceFound || this is ServiceLost || this is ServiceResolved || this is ServiceUnResolved
@@ -38,8 +39,10 @@ sealed class DiscoverEvent {
             is ServiceUnResolved -> this.service
             else -> null
         }
-//            .also {
-//            Log.d("DiscoverEvent", "${toString()} service: ${it?.serviceName}")
-//        }
     }
+
+    companion object {
+        const val TAG = "DiscoverEvent"
+    }
+
 }
