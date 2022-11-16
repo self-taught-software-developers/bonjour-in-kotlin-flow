@@ -8,7 +8,7 @@ data class ZippedDiscoverEvent(
     val name1 : String,
     val name2 : String,
     val type : String,
-    val host : InetAddress,
+    val host : InetAddress?,
     val port : Int
 ) {
     fun logIt() {

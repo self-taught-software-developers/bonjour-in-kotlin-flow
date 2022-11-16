@@ -8,6 +8,7 @@ import com.cerve.co.bonjour_in_flow.discover.model.ZippedDiscoverEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.withTimeoutOrNull
+import java.net.InetAddress
 
 class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
     constructor(context: Context) : this(NSDManagerInFlowImpl.fromContext(context))
@@ -29,7 +30,7 @@ class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
                                 name1 = f1.serviceName,
                                 name2 = r1.serviceName,
                                 type = r1.serviceType,
-                                host = r1.host,
+                                host = try { r1.host } catch (_: Exception) { null },
                                 port = r1.port
                             )
                         }
