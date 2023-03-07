@@ -17,7 +17,7 @@ import com.cerve.co.sample.UiDiscoveryState
 @Composable
 fun SampleScreen(
     discoveryState : UiDiscoveryState,
-    discoveredList: List<NsdServiceInfo>
+    discoveredList: List<String>
 ) {
 
     Scaffold(
@@ -43,7 +43,7 @@ fun SampleScreen(
 @Composable
 fun HunterNDSScreen(
     modifier: Modifier = Modifier,
-    bonjourListItems: List<NsdServiceInfo>
+    bonjourListItems: List<String>
 ) {
     LazyColumn(
         modifier = modifier,
@@ -53,13 +53,7 @@ fun HunterNDSScreen(
         itemsIndexed(bonjourListItems, key = { index, _ -> index }) { index, item ->
             Column(
                 modifier = Modifier.animateItemPlacement()
-            ) {
-                Text(text = item.serviceName)
-//                Text(text = item.serviceDSN)
-//                item.serviceIp?.let {
-//                    Text(text = "$it : ${item.servicePort}")
-//                }
-            }
+            ) { Text(text = item) }
 
             if (index != bonjourListItems.lastIndex) {
                 Divider(modifier = Modifier.padding(vertical = 12.dp))

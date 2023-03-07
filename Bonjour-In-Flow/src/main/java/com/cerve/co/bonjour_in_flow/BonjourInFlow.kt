@@ -70,6 +70,11 @@ class BonjourInFlow(private val manager: NSDManagerInFlow) {
                 }
         }
 
+        fun String.logIt(header: String = "") {
+            Timber.tag(TAG)
+                .d("$header | $this")
+        }
+
     }
 
 }
