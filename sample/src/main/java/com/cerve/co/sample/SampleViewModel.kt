@@ -26,52 +26,41 @@ class SampleViewModel @Inject constructor(
     init {
         viewModelScope.launch {
 
-            timedBonjourInFlow
-                .discoverByType(
-                    types = Pair(REALTEK_TYPE,MARVELL_TYPE)
-                ).map { it.name1 }.also { "$it".logIt("timedBonjourInFlow") }
+            bonjourInFlow.discoverServicesWithState()
+                .collect { event ->
 
+                    when(event) {
+                        is DiscoverEvent.ServiceFound,
+                        is DiscoverEvent.ServiceUnResolved,
+                        is DiscoverEvent.ServiceResolved -> {
+                            event.logIt("ServiceResolved")
+//                            _sampleUi.update {
+//                                it.copy(nsdItems = it.add(event.serviceInfo()))
+//                            }
+                        }
+                        is DiscoverEvent.ServiceLost -> {
+                            event.logIt("ServiceLost")
+//                            _sampleUi.update {
+//                                it.copy(nsdItems = it.remove(event.service))
+//                            }
+                        }
+                        is DiscoverEvent.DiscoveryStarted -> {
+                            event.logIt("DiscoveryStarted")
+//                            _sampleUi.update {
+//                                it.copy(nsdState = UiDiscoveryState.DISCOVERING)
+//                            }
+                        }
+                        else -> {
+                            event.logIt("DiscoveryStarted")
+//                            _sampleUi.update {
+//                                it.copy(nsdState = UiDiscoveryState.IDLE)
+//                            }
+                        }
+                    }
 
-//            bonjourInFlow.discoverServicesWithState()
-//                .collect { event ->
-//
-//                    when(event) {
-//                        is DiscoverEvent.ServiceFound,
-//                        is DiscoverEvent.ServiceUnResolved,
-//                        is DiscoverEvent.ServiceResolved -> {
-//                            event.logIt("ServiceResolved")
-////                            _sampleUi.update {
-////                                it.copy(nsdItems = it.add(event.serviceInfo()))
-////                            }
-//                        }
-//                        is DiscoverEvent.ServiceLost -> {
-//                            event.logIt("ServiceLost")
-////                            _sampleUi.update {
-////                                it.copy(nsdItems = it.remove(event.service))
-////                            }
-//                        }
-//                        is DiscoverEvent.DiscoveryStarted -> {
-//                            event.logIt("DiscoveryStarted")
-////                            _sampleUi.update {
-////                                it.copy(nsdState = UiDiscoveryState.DISCOVERING)
-////                            }
-//                        }
-//                        else -> {
-//                            event.logIt("DiscoveryStarted")
-////                            _sampleUi.update {
-////                                it.copy(nsdState = UiDiscoveryState.IDLE)
-////                            }
-//                        }
-//                    }
-//
-//                }
+                }
 
         }
-    }
-
-    companion object {
-        const val REALTEK_TYPE = "_Ayla_Device._tcp"
-        const val MARVELL_TYPE = "_hap._tcp"
     }
 
 }
