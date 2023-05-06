@@ -3,6 +3,7 @@ package com.cerve.co.bonjour_in_flow.discover
 import android.net.nsd.NsdServiceInfo
 import timber.log.Timber
 
+@Deprecated("")
 sealed class DiscoverEvent {
 
     data class ServiceFound(val service: NsdServiceInfo?) : DiscoverEvent()

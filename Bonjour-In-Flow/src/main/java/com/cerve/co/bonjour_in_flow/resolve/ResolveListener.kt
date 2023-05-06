@@ -6,6 +6,7 @@ import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.trySendBlocking
 
+@Deprecated("")
 data class ResolveListener(
     private val scope: ProducerScope<DiscoverEvent>
 ) : NsdManager.ResolveListener {

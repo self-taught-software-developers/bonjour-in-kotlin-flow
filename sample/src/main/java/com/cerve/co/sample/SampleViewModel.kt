@@ -1,86 +1,71 @@
 package com.cerve.co.sample
 
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.cerve.co.bonjour_in_flow.BonjourInFlow
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.logIt
+import com.cerve.co.bonjour_in_flow.DiscoveryEvent
 import com.cerve.co.bonjour_in_flow.TimedBonjourInFlow
-import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
+import com.cerve.co.bonjour_in_flow.discover.NetworkServiceDiscoveryUseCase
+import com.cerve.co.bonjour_in_flow.resolve.NetworkServiceResolutionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    private val bonjourInFlow: BonjourInFlow,
+    private val discoveryUseCase: NetworkServiceDiscoveryUseCase,
+    private val resolutionUseCase: NetworkServiceResolutionUseCase,
+    private val bonjourInFlow: com.cerve.co.bonjour_in_flow.api.BonjourInFlow,
     private val timedBonjourInFlow: TimedBonjourInFlow
 ) : ViewModel() {
 
-    private val _sampleUi = MutableStateFlow(SampleUiState())
-    val sampleUi = _sampleUi.asStateFlow()
-
     init {
         viewModelScope.launch {
-
-            bonjourInFlow.discoverServicesWithState()
-                .collect { event ->
-
-                    when(event) {
-                        is DiscoverEvent.ServiceFound,
-                        is DiscoverEvent.ServiceUnResolved,
-                        is DiscoverEvent.ServiceResolved -> {
-                            event.logIt("ServiceResolved")
-//                            _sampleUi.update {
-//                                it.copy(nsdItems = it.add(event.serviceInfo()))
-//                            }
-                        }
-                        is DiscoverEvent.ServiceLost -> {
-                            event.logIt("ServiceLost")
-//                            _sampleUi.update {
-//                                it.copy(nsdItems = it.remove(event.service))
-//                            }
-                        }
-                        is DiscoverEvent.DiscoveryStarted -> {
-                            event.logIt("DiscoveryStarted")
-//                            _sampleUi.update {
-//                                it.copy(nsdState = UiDiscoveryState.DISCOVERING)
-//                            }
-                        }
-                        else -> {
-                            event.logIt("DiscoveryStarted")
-//                            _sampleUi.update {
-//                                it.copy(nsdState = UiDiscoveryState.IDLE)
-//                            }
-                        }
+            launch {
+                bonjourInFlow.onWithTimeout(timeout = 2.seconds) {
+                    (resolutionUseCase.invoke(HAP_SERVICES)).zip(
+                        resolutionUseCase.invoke(AYLA_SERVICES)
+                    ) { hap, ayla ->
+                        DiscoveryEvent.List(listOf(hap, ayla))
                     }
-
+                }.collect { event ->
+                    event.logIt()
                 }
+            }
+
+//            launch {
+//                bonjourInFlow.onResolveWithTimeout(
+//                    type = HAP_SERVICES,
+//                    timeout = 1.seconds,
+////                    retries = 0
+//                ).collect { event ->
+//                    event.logIt()
+//                }
+//            }
 
         }
     }
 
+    companion object {
+        const val AYLA_SERVICES = "_Ayla_Device._tcp"
+        const val HAP_SERVICES = "_hap._tcp"
+        const val HTTP_SERVICES = "_http._tcp."
+        const val ALL_SERVICES = "_services._dns-sd._udp"
+
+        private const val TAG = "SampleViewModel"
+    }
+
 }
 
-data class SampleUiState(val nsdState: UiDiscoveryState = UiDiscoveryState.IDLE) {
 
-    private val _nsdItems = mutableStateListOf<String>()
-    val nsdItems = _nsdItems.toList()
-
-    fun add(items: List<String?>) {
-        _nsdItems.addAll(items.filterNotNull())
-    }
-    fun add(item: String?) = item?.let { nonNullItem ->
-        _nsdItems.add(nonNullItem)
-    }
-
-    fun remove(item: String?) = item?.let {
-        _nsdItems.remove(item)
-    }
-}
+data class SampleUiState(
+    val nsdState: UiDiscoveryState = UiDiscoveryState.IDLE,
+    val nsdItems: List<String> = emptyList()
+)
 
 enum class UiDiscoveryState {
     DISCOVERING,

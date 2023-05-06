@@ -18,13 +18,13 @@ class SampleActivity : ComponentActivity() {
             BonjourInKotlinFlowTheme {
 
                 val vm : SampleViewModel = viewModel()
-                val sampleUiState by vm.sampleUi.collectAsState()
+//                val sampleUiState by vm.sampleUi.collectAsState()
 
                 // A surface container using the 'background' color from the theme
-                SampleScreen(
-                    discoveryState = sampleUiState.nsdState,
-                    discoveredList = sampleUiState.nsdItems
-                )
+//                SampleScreen(
+//                    discoveryState = sampleUiState.nsdState,
+//                    discoveredList = sampleUiState.nsdItems
+//                )
             }
         }
     }
