@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 
+@Deprecated("")
 class NSDManagerInFlowImpl(private val nsdManager: NsdManager) : NSDManagerInFlow {
 
     override fun discoverService(

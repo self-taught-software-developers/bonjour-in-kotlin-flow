@@ -5,6 +5,7 @@ import android.net.nsd.NsdServiceInfo
 import kotlinx.coroutines.channels.ProducerScope
 import kotlinx.coroutines.channels.trySendBlocking
 
+@Deprecated("")
 data class DiscoverEventListener(
     private val scope: ProducerScope<DiscoverEvent>
 ) : NsdManager.DiscoveryListener {

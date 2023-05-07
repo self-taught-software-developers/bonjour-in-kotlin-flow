@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 import java.net.InetAddress
 
+@Deprecated("")
 data class ZippedDiscoverEvent(
     val name1 : String,
     val name2 : String,

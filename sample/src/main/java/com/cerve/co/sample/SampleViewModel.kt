@@ -4,11 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cerve.co.bonjour_in_flow.DiscoveryEvent
 import com.cerve.co.bonjour_in_flow.TimedBonjourInFlow
+import com.cerve.co.bonjour_in_flow.api.BonjourInFlow
 import com.cerve.co.bonjour_in_flow.discover.NetworkServiceDiscoveryUseCase
 import com.cerve.co.bonjour_in_flow.resolve.NetworkServiceResolutionUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -17,35 +21,32 @@ import kotlin.time.Duration.Companion.seconds
 
 @HiltViewModel
 class SampleViewModel @Inject constructor(
-    private val discoveryUseCase: NetworkServiceDiscoveryUseCase,
-    private val resolutionUseCase: NetworkServiceResolutionUseCase,
-    private val bonjourInFlow: com.cerve.co.bonjour_in_flow.api.BonjourInFlow,
-    private val timedBonjourInFlow: TimedBonjourInFlow
+    private val bonjourInFlow: BonjourInFlow,
 ) : ViewModel() {
+
+    private val _sampleUiState = MutableStateFlow(SampleUiState())
+    val sampleUiState = _sampleUiState.asStateFlow()
 
     init {
         viewModelScope.launch {
+
             launch {
-                bonjourInFlow.onWithTimeout(timeout = 2.seconds) {
-                    (resolutionUseCase.invoke(HAP_SERVICES)).zip(
-                        resolutionUseCase.invoke(AYLA_SERVICES)
-                    ) { hap, ayla ->
-                        DiscoveryEvent.List(listOf(hap, ayla))
+                bonjourInFlow.onResolveWithTimeout(
+                    type = ALL_SERVICES,
+                    timeout = 1.seconds,
+                    retries = 0
+                ).collect { event ->
+                    when(event) {
+                        is DiscoveryEvent.Started -> _sampleUiState.update { it.copy(UiDiscoveryState.DISCOVERING) }
+                        is DiscoveryEvent.Stopped -> _sampleUiState.update { it.copy(UiDiscoveryState.IDLE) }
+                        is DiscoveryEvent.Found -> _sampleUiState.update { it.copy(nsdItems = it.nsdItems + event.service.serviceName) }
+                        is DiscoveryEvent.Resolved -> _sampleUiState.update { it.copy(nsdItems = it.nsdItems + event.service.serviceName) }
+                        is DiscoveryEvent.Lost -> _sampleUiState.update { it.copy(nsdItems = it.nsdItems - event.service.serviceName) }
+                        else -> Unit
                     }
-                }.collect { event ->
                     event.logIt()
                 }
             }
-
-//            launch {
-//                bonjourInFlow.onResolveWithTimeout(
-//                    type = HAP_SERVICES,
-//                    timeout = 1.seconds,
-////                    retries = 0
-//                ).collect { event ->
-//                    event.logIt()
-//                }
-//            }
 
         }
     }

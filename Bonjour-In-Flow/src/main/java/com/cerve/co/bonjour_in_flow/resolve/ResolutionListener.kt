@@ -11,7 +11,6 @@ data class ResolutionListener(
     private val scope: ProducerScope<DiscoveryEvent>
 ) : NsdManager.ResolveListener {
     override fun onResolveFailed(serviceInfo: NsdServiceInfo?, code: Int) {
-        Timber.tag(TAG).d("$code")
         serviceInfo?.let { scope.trySendBlocking(DiscoveryEvent.Found(serviceInfo)) }
     }
 

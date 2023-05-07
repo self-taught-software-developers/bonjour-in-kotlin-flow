@@ -16,7 +16,7 @@ object Module {
 
     @Provides
     @Singleton
-    fun providesListenerInFlow(
+    fun providesDiscoveryInFlow(
         @ApplicationContext context: Context
     ) = NetworkServiceDiscoveryUseCase(context)
 

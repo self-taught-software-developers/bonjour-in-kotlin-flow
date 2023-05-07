@@ -4,19 +4,15 @@ import android.content.Context
 import android.content.Context.NSD_SERVICE
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.logThreadLifecycle
 import com.cerve.co.bonjour_in_flow.DiscoveryEvent
-import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 class NetworkServiceResolutionUseCase(private val nsdManager: NsdManager) {

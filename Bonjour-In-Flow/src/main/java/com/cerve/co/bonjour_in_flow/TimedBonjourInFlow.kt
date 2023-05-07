@@ -2,16 +2,25 @@ package com.cerve.co.bonjour_in_flow
 
 import android.content.Context
 import android.net.nsd.NsdServiceInfo
-import com.cerve.co.bonjour_in_flow.BonjourInFlow.Companion.logThreadLifecycle
 import com.cerve.co.bonjour_in_flow.discover.DiscoverEvent
 import com.cerve.co.bonjour_in_flow.discover.model.ZippedDiscoverEvent
 import com.cerve.co.bonjour_in_flow.discover.model.ZippedDiscoverEvent.Companion.logZippedDiscoverEmission
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
+@Deprecated("unstable", replaceWith = ReplaceWith("BonjourInFlow"))
 class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
     constructor(context: Context) : this(NSDManagerInFlowImpl.fromContext(context))
 
@@ -67,4 +76,29 @@ class TimedBonjourInFlow (private val manager: NSDManagerInFlow) {
         return manager.resolveService(this).first().serviceInfo()
     }
 
+    companion object {
+        private const val SERVICES_DOMAIN = "_services._dns-sd._udp"
+
+        fun String.toDiscoveryType() : String {
+            return "$this._tcp"
+        }
+
+        fun <T> Flow<T>.logThreadLifecycle() : Flow<T> {
+            return this
+                .onStart {
+                    Timber.tag(DiscoverEvent.TAG)
+                        .d("startedIn context: ${currentCoroutineContext()}")
+                }
+                .onCompletion {
+                    Timber.tag(DiscoverEvent.TAG)
+                        .d("completedIn context: ${currentCoroutineContext()}")
+                }
+        }
+
+        fun String.logIt(header: String = "") {
+            Timber.tag(DiscoverEvent.TAG)
+                .d("$header | $this")
+        }
+
+    }
 }
